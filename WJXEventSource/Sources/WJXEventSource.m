@@ -106,6 +106,7 @@ WJXEventName const WJXEventNameError = @"error";
         self.listeners = [NSMutableDictionary dictionary];
         self.session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration ephemeralSessionConfiguration] delegate:self delegateQueue:NSOperationQueue.mainQueue];
         self.buffer = [NSMutableData data];
+        self.retryInterval = 3.0;
     }
     return self;
 }
