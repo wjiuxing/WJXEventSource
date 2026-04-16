@@ -170,6 +170,19 @@ didReceiveResponse:(NSURLResponse *)response
 {
     NSHTTPURLResponse *HTTPResponse = (NSHTTPURLResponse *)response;
     if (200 == HTTPResponse.statusCode) {
+        NSString *contentType = HTTPResponse.allHeaderFields[@"Content-Type"];
+        if (![contentType hasPrefix:@"text/event-stream"]) {
+            if (nil != completionHandler) {
+                completionHandler(NSURLSessionResponseCancel);
+            }
+            WJXEvent *event = [[WJXEvent alloc] initWithReadyState:WJXEventStateClosed];
+            event.error = [NSError errorWithDomain:@"WJXEventSource" code:-1 userInfo:@{
+                NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Invalid Content-Type: expected 'text/event-stream', got '%@'", contentType ?: @"(null)"],
+            }];
+            [self _dispatchEvent:event forName:WJXEventNameError];
+            return;
+        }
+        
         self.retryCount = 0;
         WJXEvent *event = [[WJXEvent alloc] initWithReadyState:WJXEventStateOpen];
         [self _dispatchEvent:event forName:WJXEventNameReadyState];
