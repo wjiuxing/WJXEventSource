@@ -56,6 +56,9 @@ typedef void(^WJXEventSourceEventHandler)(WJXEvent *event);
 
 @property (nonatomic, assign) BOOL ignoreRetryAction;
 
+/// 最大重连次数，默认为 NSUIntegerMax（无限制）
+@property (nonatomic, assign) NSUInteger maxRetryCount;
+
 - (instancetype)initWithRequest:(NSURLRequest *)request;
 
 - (void)addListener:(WJXEventSourceEventHandler)listener

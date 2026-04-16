@@ -96,6 +96,8 @@ WJXEventName const WJXEventNameError = @"error";
 @property (nonatomic, assign) BOOL closedByUser;
 @property (nonatomic, strong) NSMutableData *buffer;
 
+@property (nonatomic, assign) NSUInteger retryCount;
+
 @end
 
 @implementation WJXEventSource
@@ -109,6 +111,7 @@ WJXEventName const WJXEventNameError = @"error";
         self.session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration ephemeralSessionConfiguration] delegate:self delegateQueue:NSOperationQueue.mainQueue];
         self.buffer = [NSMutableData data];
         self.retryInterval = 3.0;
+        self.maxRetryCount = NSUIntegerMax;
     }
     return self;
 }
@@ -167,6 +170,7 @@ didReceiveResponse:(NSURLResponse *)response
 {
     NSHTTPURLResponse *HTTPResponse = (NSHTTPURLResponse *)response;
     if (200 == HTTPResponse.statusCode) {
+        self.retryCount = 0;
         WJXEvent *event = [[WJXEvent alloc] initWithReadyState:WJXEventStateOpen];
         [self _dispatchEvent:event forName:WJXEventNameReadyState];
         [self _dispatchEvent:event forName:WJXEventNameOpen];
@@ -203,8 +207,10 @@ didCompleteWithError:(nullable NSError *)error;
     
     if (nil != error) {
         [self _dispatchEvent:event forName:WJXEventNameError];
-        if (!_ignoreRetryAction) {
-            [self performSelector:@selector(open) withObject:nil afterDelay:_retryInterval];
+        if (!_ignoreRetryAction && _retryCount < _maxRetryCount) {
+            NSTimeInterval delay = _retryInterval * (1 << MIN(_retryCount, 6));
+            [self performSelector:@selector(open) withObject:nil afterDelay:delay];
+            self.retryCount = _retryCount + 1;
         }
     }
 }
