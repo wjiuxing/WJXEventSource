@@ -7,10 +7,23 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6B41C7222F91E21C006CB269 /* WJXEventSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BB23DAA2D5861B4004771A6 /* WJXEventSource.m */; };
 		6BB23DAB2D5861B4004771A6 /* WJXEventSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BB23DAA2D5861B4004771A6 /* WJXEventSource.m */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		6B41C7182F91E103006CB269 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6BB23D822D585E38004771A6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6BB23D892D585E38004771A6;
+			remoteInfo = WJXEventSource;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		6B41C7142F91E103006CB269 /* WJXEventSourceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WJXEventSourceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6B41C73D2F91E65F006CB269 /* WJXEventSource-Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "WJXEventSource-Private.h"; sourceTree = "<group>"; };
 		6BB23D8A2D585E38004771A6 /* WJXEventSource.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WJXEventSource.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6BB23DA92D5861B4004771A6 /* WJXEventSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WJXEventSource.h; sourceTree = "<group>"; };
 		6BB23DAA2D5861B4004771A6 /* WJXEventSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WJXEventSource.m; sourceTree = "<group>"; };
@@ -27,6 +40,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		6B41C7152F91E103006CB269 /* WJXEventSourceTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = WJXEventSourceTests;
+			sourceTree = "<group>";
+		};
 		6BB23D8C2D585E38004771A6 /* WJXEventSourceViewer */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -38,6 +56,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		6B41C7112F91E103006CB269 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6BB23D872D585E38004771A6 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -53,6 +78,7 @@
 			children = (
 				6BB23DA72D58616B004771A6 /* Sources */,
 				6BB23D8C2D585E38004771A6 /* WJXEventSourceViewer */,
+				6B41C7152F91E103006CB269 /* WJXEventSourceTests */,
 				6BB23D8B2D585E38004771A6 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -61,6 +87,7 @@
 			isa = PBXGroup;
 			children = (
 				6BB23D8A2D585E38004771A6 /* WJXEventSource.app */,
+				6B41C7142F91E103006CB269 /* WJXEventSourceTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -70,6 +97,7 @@
 			children = (
 				6BB23DA92D5861B4004771A6 /* WJXEventSource.h */,
 				6BB23DAA2D5861B4004771A6 /* WJXEventSource.m */,
+				6B41C73D2F91E65F006CB269 /* WJXEventSource-Private.h */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -77,6 +105,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		6B41C7132F91E103006CB269 /* WJXEventSourceTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6B41C71C2F91E103006CB269 /* Build configuration list for PBXNativeTarget "WJXEventSourceTests" */;
+			buildPhases = (
+				6B41C7102F91E103006CB269 /* Sources */,
+				6B41C7112F91E103006CB269 /* Frameworks */,
+				6B41C7122F91E103006CB269 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6B41C7192F91E103006CB269 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				6B41C7152F91E103006CB269 /* WJXEventSourceTests */,
+			);
+			name = WJXEventSourceTests;
+			packageProductDependencies = (
+			);
+			productName = WJXEventSourceTests;
+			productReference = 6B41C7142F91E103006CB269 /* WJXEventSourceTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		6BB23D892D585E38004771A6 /* WJXEventSource */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6BB23DA22D585E3A004771A6 /* Build configuration list for PBXNativeTarget "WJXEventSource" */;
@@ -108,6 +159,10 @@
 				BuildIndependentTargetsInParallel = 1;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
+					6B41C7132F91E103006CB269 = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = 6BB23D892D585E38004771A6;
+					};
 					6BB23D892D585E38004771A6 = {
 						CreatedOnToolsVersion = 16.2;
 					};
@@ -128,11 +183,19 @@
 			projectRoot = "";
 			targets = (
 				6BB23D892D585E38004771A6 /* WJXEventSource */,
+				6B41C7132F91E103006CB269 /* WJXEventSourceTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		6B41C7122F91E103006CB269 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6BB23D882D585E38004771A6 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -143,6 +206,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		6B41C7102F91E103006CB269 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6B41C7222F91E21C006CB269 /* WJXEventSource.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6BB23D862D585E38004771A6 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -153,7 +224,55 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		6B41C7192F91E103006CB269 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6BB23D892D585E38004771A6 /* WJXEventSource */;
+			targetProxy = 6B41C7182F91E103006CB269 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		6B41C71A2F91E103006CB269 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = NSX7T7ZG34;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/WJXEventSource/Sources/**";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wjx.WJXEventSourceTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WJXEventSource.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/WJXEventSource";
+			};
+			name = Debug;
+		};
+		6B41C71B2F91E103006CB269 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = NSX7T7ZG34;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/WJXEventSource/Sources/**";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wjx.WJXEventSourceTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WJXEventSource.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/WJXEventSource";
+			};
+			name = Release;
+		};
 		6BB23DA32D585E3A004771A6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -327,6 +446,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		6B41C71C2F91E103006CB269 /* Build configuration list for PBXNativeTarget "WJXEventSourceTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6B41C71A2F91E103006CB269 /* Debug */,
+				6B41C71B2F91E103006CB269 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		6BB23D852D585E38004771A6 /* Build configuration list for PBXProject "WJXEventSource" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
