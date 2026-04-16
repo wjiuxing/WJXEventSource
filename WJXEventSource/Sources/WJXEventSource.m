@@ -86,6 +86,7 @@ WJXEventName const WJXEventNameError = @"error";
 
 @property (nonatomic, strong) NSMutableURLRequest *request;
 @property (nonatomic, strong) NSMutableDictionary<WJXEventName, NSMutableArray<WJXEventHandler *> *> *listeners;
+@property (nonatomic, strong) dispatch_queue_t listenersQueue;
 
 @property (nonatomic, strong) NSURLSession *session;
 @property (nonatomic, strong) NSURLSessionDataTask *dataTask;
@@ -104,6 +105,7 @@ WJXEventName const WJXEventNameError = @"error";
     if (self = [super init]) {
         self.request = [request mutableCopy];
         self.listeners = [NSMutableDictionary dictionary];
+        self.listenersQueue = dispatch_queue_create("com.wjx.eventsource.listeners", DISPATCH_QUEUE_CONCURRENT);
         self.session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration ephemeralSessionConfiguration] delegate:self delegateQueue:NSOperationQueue.mainQueue];
         self.buffer = [NSMutableData data];
         self.retryInterval = 3.0;
@@ -117,18 +119,20 @@ WJXEventName const WJXEventNameError = @"error";
 }
 
 - (void)addListener:(WJXEventSourceEventHandler)listener
-           forEvent:(WJXEventName)eventName
-              queue:(nullable NSOperationQueue *)queue;
+            forEvent:(WJXEventName)eventName
+               queue:(nullable NSOperationQueue *)queue;
 {
     if (nil == listener) {
         return;
     }
     
-    NSMutableArray *listeners = self.listeners[eventName];
-    if (nil == listeners) {
-        self.listeners[eventName] = listeners = [NSMutableArray array];
-    }
-    [listeners addObject:[[WJXEventHandler alloc] initWithHandler:listener queue:queue]];
+    dispatch_barrier_async(self.listenersQueue, ^{
+        NSMutableArray *listeners = self.listeners[eventName];
+        if (nil == listeners) {
+            self.listeners[eventName] = listeners = [NSMutableArray array];
+        }
+        [listeners addObject:[[WJXEventHandler alloc] initWithHandler:listener queue:queue]];
+    });
 }
 
 - (void)open;
@@ -264,8 +268,11 @@ didCompleteWithError:(nullable NSError *)error;
 
 - (void)_dispatchEvent:(WJXEvent *)event forName:(WJXEventName)name
 {
-    NSMutableArray<WJXEventHandler *> *listeners = self.listeners[name];
-    [listeners enumerateObjectsUsingBlock:^(WJXEventHandler * _Nonnull handler, NSUInteger idx, BOOL * _Nonnull stop) {
+    __block NSMutableArray<WJXEventHandler *> *snapshot = nil;
+    dispatch_sync(self.listenersQueue, ^{
+        snapshot = [self.listeners[name] copy];
+    });
+    [snapshot enumerateObjectsUsingBlock:^(WJXEventHandler * _Nonnull handler, NSUInteger idx, BOOL * _Nonnull stop) {
         NSOperationQueue *queue = handler.queue ?: NSOperationQueue.mainQueue;
         [queue addOperationWithBlock:^{
             handler.handler(event);
