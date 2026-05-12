@@ -6,6 +6,7 @@
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Language](https://img.shields.io/badge/language-Objective--C-orange)
 ![CocoaPods](https://img.shields.io/badge/CocoaPods-compatible-4BC51D)
+![Swift Package Manager](https://img.shields.io/badge/SPM-compatible-orange)
 
 HTML5 Server-Sent Events (SSE) client for iOS, implemented in Objective-C. Inspired by [EventSource](https://github.com/neilco/EventSource).
 
@@ -21,6 +22,7 @@ HTML5 Server-Sent Events (SSE) client for iOS, implemented in Objective-C. Inspi
 - Optional callback queue targeting (defaults to main queue)
 - Zero external dependencies
 - CocoaPods integration
+- Swift Package Manager (SPM) integration
 
 ## Requirements
 
@@ -43,6 +45,18 @@ Then run:
 ```bash
 pod install
 ```
+
+### Swift Package Manager
+
+Add the dependency in your `Package.swift`:
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/wjiuxing/WJXEventSource.git", from: "0.0.1")
+]
+```
+
+Or add directly in Xcode: **File → Add Package Dependencies** → paste the repository URL.
 
 ## Usage
 
