@@ -12,7 +12,12 @@ NS_ASSUME_NONNULL_BEGIN
 @interface WJXEventSource ()
 
 @property (nonatomic, assign) NSTimeInterval retryInterval;
+@property (nonatomic, strong) NSMutableData *buffer;
+@property (nonatomic, strong) NSURLSessionDataTask *dataTask;
+@property (nonatomic, assign) BOOL bufferOverflow;
 
+- (void)_appendNormalizedData:(NSData *)data;
+- (NSMutableArray<NSData *> *)_drainBuffer;
 - (void)_parseEventData:(NSData *)data;
 
 @end

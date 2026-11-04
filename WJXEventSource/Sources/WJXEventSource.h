@@ -52,11 +52,13 @@ typedef NS_ENUM(NSUInteger, WJXEventState) {
 
 typedef void(^WJXEventSourceEventHandler)(WJXEvent *event);
 
+/// HTML5 Server-Sent Events 客户端。
+/// 注意:用完必须调用 close 释放连接;否则 session 会强持有实例直至任务结束。
 @interface WJXEventSource : NSObject
 
 @property (nonatomic, assign) BOOL ignoreRetryAction;
 
-/// 最大重连次数，默认为 NSUIntegerMax（无限制）
+/// 最大重连次数,默认为 NSUIntegerMax(无限制)
 @property (nonatomic, assign) NSUInteger maxRetryCount;
 
 - (instancetype)initWithRequest:(NSURLRequest *)request;
@@ -64,6 +66,10 @@ typedef void(^WJXEventSourceEventHandler)(WJXEvent *event);
 - (void)addListener:(WJXEventSourceEventHandler)listener
            forEvent:(WJXEventName)eventName
               queue:(nullable NSOperationQueue *)queue;
+
+/// 移除监听。按传入 block 的指针匹配移除;同一 block 注册多次会全部移除。
+- (void)removeListener:(WJXEventSourceEventHandler)listener
+              forEvent:(WJXEventName)eventName;
 
 - (void)open;
 - (void)close;
