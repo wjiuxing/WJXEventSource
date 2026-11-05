@@ -46,6 +46,9 @@ typedef NS_ENUM(NSUInteger, WJXEventState) {
 @property (nonatomic, assign) WJXEventState readyState;
 @property (nonatomic, strong, nullable) NSError *error;
 
+/// YES 表示服务端无错误正常断开,此时 error 仅为兼容旧回调形状的合成对象
+@property (nonatomic, assign, readonly) BOOL cleanClose;
+
 - (instancetype)initWithReadyState:(WJXEventState)readyState;
 
 @end

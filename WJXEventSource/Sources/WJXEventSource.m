@@ -25,6 +25,13 @@ static const NSUInteger kWJXEventSourceMaxBufferSize = 1024 * 1024;
 /// 重连延迟上限(秒),防服务端超大 retry 值导致 NSTimeInterval→int64 转换溢出(UB)
 static const NSTimeInterval kWJXEventSourceMaxRetryDelay = 300.0;
 
+@interface WJXEvent ()
+
+@property (nonatomic, assign, readwrite) BOOL cleanClose;
+
+@end
+
+
 #pragma mark -
 #pragma mark WJXEvent
 
@@ -377,6 +384,7 @@ didCompleteWithError:(nullable NSError *)error;
         event.error = [NSError errorWithDomain:@"WJXEventSource" code:event.readyState userInfo:@{
             NSLocalizedDescriptionKey: @"Connection with the event source was closed without error",
         }];
+        event.cleanClose = YES;
     }
 
     // 响应阶段(非 200/非法 Content-Type)已派发过 error:随后的取消型 completion
@@ -454,7 +462,6 @@ didCompleteWithError:(nullable NSError *)error;
 
     const uint8_t *bytes = data.bytes;
     NSUInteger length = data.length;
-    NSMutableData *normalized = [NSMutableData dataWithCapacity:length];
     if (_pendingCR && '\n' == bytes[0]) {
         // 上一 chunk 以 \r 收尾且本 chunk 以 \n 开头:合并为一个行尾
         bytes += 1;
@@ -464,18 +471,23 @@ didCompleteWithError:(nullable NSError *)error;
         _pendingCR = NO;
         return;
     }
+    NSUInteger runStart = 0;
     for (NSUInteger i = 0; i < length; i++) {
         if ('\r' == bytes[i]) {
-            [normalized appendBytes:"\n" length:1];
+            if (i > runStart) {
+                [_buffer appendBytes:bytes + runStart length:i - runStart];
+            }
+            [_buffer appendBytes:"\n" length:1];
             if (i + 1 < length && '\n' == bytes[i + 1]) {
                 i++;
             }
-        } else {
-            [normalized appendBytes:bytes + i length:1];
+            runStart = i + 1;
         }
     }
     _pendingCR = ('\r' == bytes[length - 1]);
-    [_buffer appendData:normalized];
+    if (length > runStart) {
+        [_buffer appendBytes:bytes + runStart length:length - runStart];
+    }
 }
 
 /// 扫描并消费 buffer 中已完整的事件(以 \n\n 分隔)。调用方必须已持锁。
@@ -491,7 +503,6 @@ didCompleteWithError:(nullable NSError *)error;
         // 单个完整事件超上限:置位标志并清空,交给 didReceiveData 锁外报错并关闭
         if (range.location > kWJXEventSourceMaxBufferSize) {
             _bufferOverflow = YES;
-            [completedEvents removeAllObjects];
             [_buffer setLength:0];
             return completedEvents;
         }

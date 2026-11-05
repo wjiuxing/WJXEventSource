@@ -304,6 +304,22 @@
     XCTAssertFalse(self.eventSource.bufferOverflow);
 }
 
+/// 超大坏事件不能吞掉同一 buffer 中位于其前面的已完成合法事件
+- (void)testCompleteEventsBeforeOversizedEventStillDelivered
+{
+    NSMutableData *payload = [NSMutableData data];
+    [payload appendData:[@"data: valid\n\n" dataUsingEncoding:NSUTF8StringEncoding]];
+    [payload appendData:[@"data: " dataUsingEncoding:NSUTF8StringEncoding]];
+    [payload increaseLengthBy:1200 * 1024];
+    [payload appendData:[@"\n\n" dataUsingEncoding:NSUTF8StringEncoding]];
+
+    [self.eventSource _appendNormalizedData:payload];
+    NSMutableArray<NSData *> *events = [self.eventSource _drainBuffer];
+
+    XCTAssertEqual(events.count, 1);
+    XCTAssertTrue(self.eventSource.bufferOverflow);
+}
+
 - (NSHTTPURLResponse *)testResponseWithStatusCode:(NSInteger)statusCode contentType:(NSString *)contentType
 {
     return [[NSHTTPURLResponse alloc] initWithURL:[NSURL URLWithString:@"http://localhost/"]
@@ -362,6 +378,26 @@
     // 第二次(非法 MIME)才失败:恰好 1 次 error,取消型 completion 不重复
     XCTAssertEqual(errors.count, 1);
     XCTAssertEqual(errors.firstObject.error.code, -1);
+
+    [source close];
+}
+
+/// 服务端无错误断开时,readyState 事件应显式标记 cleanClose,调用方不得依赖内部 NSError 约定
+- (void)testCleanCloseFlaggedOnReadyStateEvent
+{
+    NSMutableArray<WJXEvent *> *states = [NSMutableArray array];
+    WJXEventSource *source = [[WJXEventSource alloc] initWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://localhost/"]]];
+    [source addListener:^(WJXEvent *event) {
+        @synchronized (states) {
+            [states addObject:event];
+        }
+    } forEvent:WJXEventNameReadyState queue:self.testQueue];
+    [source open];
+
+    [(id<NSURLSessionTaskDelegate>)source URLSession:nil task:source.dataTask didCompleteWithError:nil];
+    [self.testQueue waitUntilAllOperationsAreFinished];
+
+    XCTAssertTrue(states.lastObject.cleanClose);
 
     [source close];
 }
