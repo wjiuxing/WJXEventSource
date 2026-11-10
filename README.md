@@ -14,6 +14,7 @@ HTML5 Server-Sent Events (SSE) client for iOS, implemented in Objective-C. Inspi
 
 - HTML5 SSE protocol compliance (parsing `id`, `event`, `data`, `retry` fields)
 - Event-listener pattern with `addListener:forEvent:queue:`
+- Named SSE event dispatch (`event:` selects the listener event name)
 - Automatic reconnection with exponential backoff
 - Configurable max retry count
 - Thread-safe listener management (concurrent GCD queue with barrier writes)
@@ -84,6 +85,10 @@ WJXEventSource *source = [[WJXEventSource alloc] initWithRequest:request];
     NSLog(@"error: %@", event.error);
 } forEvent:WJXEventNameError queue:nil];
 
+[source addListener:^(WJXEvent *event) {
+    NSLog(@"update: %@", event.data);
+} forEvent:@"update" queue:nil];
+
 [source open];
 ```
 
@@ -97,7 +102,7 @@ Don't forget to call `close` when done:
 
 | Constant | Value | Description |
 |---|---|---|
-| `WJXEventNameMessage` | `@"message"` | SSE message events |
+| `WJXEventNameMessage` | `@"message"` | SSE events without an `event:` field |
 | `WJXEventNameOpen` | `@"open"` | Connection opened |
 | `WJXEventNameReadyState` | `@"readyState"` | Connection state changed |
 | `WJXEventNameError` | `@"error"` | Error occurred |
@@ -131,12 +136,14 @@ source.maxRetryCount = 10;          // limit to 10 retry attempts
 | `ignoreRetryAction` | `BOOL` — Set `YES` to disable automatic reconnection (default `NO`) |
 | `maxRetryCount` | `NSUInteger` — Maximum number of retry attempts (default `NSUIntegerMax`, unlimited) |
 
+For an SSE event containing `event: update`, register a listener with `forEvent:@"update"`. Events without an `event:` field are dispatched as `message`.
+
 ### WJXEvent
 
 | Property | Type | Description |
 |---|---|---|
 | `eventId` | `id` (nullable) | The SSE event ID |
-| `event` | `NSString *` (nullable) | The event type name |
+| `event` | `NSString *` (nullable) | The event type name used for listener dispatch |
 | `data` | `NSString *` (nullable) | Event data. Multi-line `data:` fields are joined with `\n` per the SSE spec. |
 | `readyState` | `WJXEventState` | Current connection state |
 | `error` | `NSError *` (nullable) | Error object, if applicable |

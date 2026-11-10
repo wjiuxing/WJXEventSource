@@ -14,6 +14,7 @@ iOS 平台上的 HTML5 Server-Sent Events (SSE) 客户端，使用 Objective-C �
 
 - 完整遵循 HTML5 SSE 协议（解析 `id`、`event`、`data`、`retry` 字段）
 - 基于 `addListener:forEvent:queue:` 的事件监听模式
+- 支持命名 SSE 事件派发（`event:` 字段决定监听事件名）
 - 断线自动重连，支持指数退避策略
 - 可配置最大重试次数
 - 线程安全的监听器管理（并发 GCD 队列 + barrier 写入）
@@ -84,6 +85,10 @@ WJXEventSource *source = [[WJXEventSource alloc] initWithRequest:request];
     NSLog(@"error: %@", event.error);
 } forEvent:WJXEventNameError queue:nil];
 
+[source addListener:^(WJXEvent *event) {
+    NSLog(@"update: %@", event.data);
+} forEvent:@"update" queue:nil];
+
 [source open];
 ```
 
@@ -97,7 +102,7 @@ WJXEventSource *source = [[WJXEventSource alloc] initWithRequest:request];
 
 | 常量 | 值 | 说明 |
 |---|---|---|
-| `WJXEventNameMessage` | `@"message"` | SSE 消息事件 |
+| `WJXEventNameMessage` | `@"message"` | 未声明 `event:` 字段的 SSE 事件 |
 | `WJXEventNameOpen` | `@"open"` | 连接已建立 |
 | `WJXEventNameReadyState` | `@"readyState"` | 连接状态变化 |
 | `WJXEventNameError` | `@"error"` | 发生错误 |
@@ -131,12 +136,14 @@ source.maxRetryCount = 10;          // 最多重试 10 次
 | `ignoreRetryAction` | `BOOL` — 设为 `YES` 禁用自动重连（默认 `NO`） |
 | `maxRetryCount` | `NSUInteger` — 最大重试次数（默认 `NSUIntegerMax`，即无限制） |
 
+服务端发送 `event: update` 时，使用 `forEvent:@"update"` 注册监听；未声明 `event:` 字段的事件会派发到 `message`。
+
 ### WJXEvent
 
 | 属性 | 类型 | 说明 |
 |---|---|---|
 | `eventId` | `id`（可空） | SSE 事件 ID |
-| `event` | `NSString *`（可空） | 事件类型名称 |
+| `event` | `NSString *`（可空） | 用于监听器派发的事件类型名称 |
 | `data` | `NSString *`（可空） | 事件数据。多行 `data:` 字段按 SSE 规范以 `\n` 拼接。 |
 | `readyState` | `WJXEventState` | 当前连接状态 |
 | `error` | `NSError *`（可空） | 错误信息 |

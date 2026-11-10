@@ -92,7 +92,9 @@ Pod::Spec.new do |spec|
   #  Not including the public_header_files will make all headers public.
   #
 
-  spec.source_files  = "WJXEventSource", "WJXEventSource/Sources/*.{h,m}"
+  spec.source_files  = "WJXEventSource/Sources/*.{h,m}"
+  # 测试专用私有头文件,不随 Pod 分发
+  spec.exclude_files = "WJXEventSource/Sources/WJXEventSource-Private.h"
   #spec.exclude_files = "Classes/Exclude"
 
   # spec.public_header_files = "Classes/**/*.h"

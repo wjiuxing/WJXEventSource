@@ -43,7 +43,7 @@ pod 'WJXEventSource'
 
 | Constant | Value | When Fired |
 |---|---|---|
-| `WJXEventNameMessage` | `@"message"` | Every SSE event received |
+| `WJXEventNameMessage` | `@"message"` | SSE events without an `event:` field |
 | `WJXEventNameOpen` | `@"open"` | Connection established |
 | `WJXEventNameReadyState` | `@"readyState"` | State changed |
 | `WJXEventNameError` | `@"error"` | Error occurred |
@@ -53,7 +53,7 @@ pod 'WJXEventSource'
 | Property | Type | Description |
 |---|---|---|
 | `eventId` | `id` | SSE `id:` field |
-| `event` | `NSString *` | SSE `event:` field (parsed, not used for dispatch) |
+| `event` | `NSString *` | SSE `event:` field; its value selects the listener event name |
 | `data` | `NSString *` | SSE `data:` field. Multi-line joined with `\n`. |
 | `readyState` | `WJXEventState` | Connecting(0) / Open(1) / Closed(2) |
 | `error` | `NSError *` | Error object on error events |

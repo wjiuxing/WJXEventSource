@@ -32,6 +32,19 @@ WJXEventSource *source = [[WJXEventSource alloc] initWithRequest:request];
 [source open];
 ```
 
+## Named SSE Events
+
+```objc
+// Server event:
+// event: update
+// data: {"version":2}
+[source addListener:^(WJXEvent *event) {
+    NSLog(@"update data: %@", event.data);
+} forEvent:@"update" queue:nil];
+```
+
+Events without an `event:` field are dispatched as `WJXEventNameMessage`.
+
 ## Lifecycle Management
 
 ```objc

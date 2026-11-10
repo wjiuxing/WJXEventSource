@@ -45,12 +45,17 @@ typedef NS_ENUM(NSUInteger, WJXEventState) {
 @property (nonatomic, assign) WJXEventState readyState;
 @property (nonatomic, strong, nullable) NSError *error;
 
+/// YES 表示服务端无错误正常断开,此时 error 仅为兼容旧回调形状的合成对象
+@property (nonatomic, assign, readonly) BOOL cleanClose;
+
 - (instancetype)initWithReadyState:(WJXEventState)readyState;
 
 @end
 
 typedef void(^WJXEventSourceEventHandler)(WJXEvent *event);
 
+/// HTML5 Server-Sent Events 客户端。
+/// 注意:用完必须调用 close 释放连接;否则 session 会强持有实例直至任务结束。
 @interface WJXEventSource : NSObject
 
 @property (nonatomic, assign) BOOL ignoreRetryAction;
@@ -63,6 +68,10 @@ typedef void(^WJXEventSourceEventHandler)(WJXEvent *event);
 - (void)addListener:(WJXEventSourceEventHandler)listener
            forEvent:(WJXEventName)eventName
               queue:(nullable NSOperationQueue *)queue;
+
+/// 移除监听。按传入 block 的指针匹配移除;同一 block 注册多次会全部移除。
+- (void)removeListener:(WJXEventSourceEventHandler)listener
+              forEvent:(WJXEventName)eventName;
 
 - (void)open;
 - (void)close;
