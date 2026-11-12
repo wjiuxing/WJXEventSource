@@ -207,6 +207,10 @@ static const NSUInteger kWJXEventSourceProcessSliceSize = 1 << 16;
         _closedByUser = NO;
         if (_lastEventId.length) {
             [_request setValue:_lastEventId forHTTPHeaderField:@"Last-Event-ID"];
+        } else if (nil != _lastEventId) {
+            // 服务端发过空 id 表示清除:同步移除请求头,避免跨重连携带旧 ID;
+            // lastEventId 仍为 nil(从未收到过 id)时不动调用方自设的请求头
+            [_request setValue:nil forHTTPHeaderField:@"Last-Event-ID"];
         }
         // 重开丢弃上一连接残留半包与归一化状态,防止跨流拼接出脏事件
         [_buffer setLength:0];
@@ -642,6 +646,7 @@ didCompleteWithError:(nullable NSError *)error;
             self.retryInterval = [retryString doubleValue] / 1000;
         }
         if (event.eventId) {
+            // 规范:id 字段出现即更新(含空串,空串表示清除已记录的 Last-Event-ID)
             self.lastEventId = event.eventId;
         }
     }
