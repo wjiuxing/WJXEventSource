@@ -196,6 +196,16 @@ static const NSUInteger kWJXEventSourceProcessSliceSize = 1 << 16;
 
 - (void)open;
 {
+    @synchronized (self) {
+        // 手动 open 重置重连预算:耗尽 maxRetryCount 后的重新打开应获得完整的重试机会
+        _retryCount = 0;
+    }
+    [self _openInternal];
+}
+
+/// 自动重连专用:不重置重连预算,否则每轮重连都把 backoff 计数归零
+- (void)_openInternal;
+{
     NSUInteger stateGeneration = 0;
     @synchronized (self) {
         // 错误后排期的重连,期间发生任何 open/close(手动重连、关闭)都作废
@@ -465,7 +475,8 @@ didCompleteWithError:(nullable NSError *)error;
                 if (strongSelf->_stateGeneration != stateGeneration) {
                     return;
                 }
-                [strongSelf open];
+                // 自动重连路径:不重置重连预算(open 才重置)
+                [strongSelf _openInternal];
             }
         });
     }
@@ -652,6 +663,7 @@ didCompleteWithError:(nullable NSError *)error;
     }
 
     // 规范:仅 data 字段出现过才派发;显式 event 字段按事件名派发,否则派发 message
+    // (服务端契约:只发默认 message 事件,不回落 named event 到 message)
     if (nil != event.data) {
         WJXEventName eventName = event.event.length > 0 ? event.event : WJXEventNameMessage;
         [self _dispatchEvent:event forName:eventName stateGeneration:stateGeneration];
