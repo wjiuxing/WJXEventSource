@@ -309,8 +309,12 @@ didReceiveResponse:(NSURLResponse *)response
     }
 
     @synchronized (self) {
-        // 响应判定与状态提交同临界区;解析响应期间被 open/close 顶替的任务只允许取消
-        if (_closedByUser || dataTask != _dataTask) {
+        // 解析响应期间被 open/close 顶替的任务只允许取消(close 会置空 _dataTask,统一走引用不等分支)
+        if (dataTask != _dataTask) {
+            // 被顶替的任务:必须调用 completionHandler,NSURLSession delegate API 不允许跳过
+            if (nil != completionHandler) {
+                completionHandler(NSURLSessionResponseCancel);
+            }
             disposition = NSURLSessionResponseCancel;
             return;
         }
