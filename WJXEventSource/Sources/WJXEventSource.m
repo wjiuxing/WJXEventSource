@@ -403,8 +403,9 @@ didCompleteWithError:(nullable NSError *)error;
         if (!closedByUser && (NSURLSessionDataTask *)task != _dataTask) {
             return;
         }
-        // 服务端正常 EOF 也属于断流,与网络错误一样按规范自动重连
-        if (!closedByUser && !_ignoreRetryAction && _retryCount < _maxRetryCount) {
+        // 服务端正常 EOF 也属于断流,与网络错误一样按规范自动重连;
+        // 但响应阶段已判失败(非 200/非法 Content-Type)属规范定义的终态 fail the connection,不重连
+        if (!closedByUser && !responseFailed && !_ignoreRetryAction && _retryCount < _maxRetryCount) {
             shouldRetry = YES;
             stateGeneration = _stateGeneration;
             // 先自增再调度:原顺序在窗口内重复进入会多重调度重连
@@ -429,7 +430,7 @@ didCompleteWithError:(nullable NSError *)error;
     }
 
     // 响应阶段(非 200/非法 Content-Type)已派发过 error:随后的取消型 completion
-    // 不再重复派发 readyState/error,JS 端只收一次;重连仍按规范继续
+    // 不再重复派发 readyState/error,JS 端只收一次;该终态也不再自动重连(见上方 shouldRetry 判定)
     BOOL suppressDuplicateError = responseFailed
         && NSURLErrorDomain == error.domain
         && NSURLErrorCancelled == error.code;
