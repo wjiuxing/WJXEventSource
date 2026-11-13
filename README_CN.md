@@ -53,7 +53,7 @@ pod install
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/wjiuxing/WJXEventSource.git", from: "0.0.1")
+    .package(url: "https://github.com/wjiuxing/WJXEventSource.git", from: "0.0.2")
 ]
 ```
 
